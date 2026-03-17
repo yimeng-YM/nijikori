@@ -631,7 +631,7 @@ function App() {
               </motion.button>
 
               {/* Decorative Header */}
-              <div className="bg-gradient-to-br from-nijiko-blue to-blue-400 p-8 text-center relative overflow-hidden">
+              <div className="p-8 text-center relative overflow-hidden" style={{ backgroundColor: '#87CEEB' }}>
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}

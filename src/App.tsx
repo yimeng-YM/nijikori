@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Heart, Star, Music, ChevronDown } from 'lucide-react';
+import { Heart, Star, Music, ChevronDown, Sparkles, X } from 'lucide-react';
 import MouseTrail from './components/MouseTrail';
 import ClickEffect from './components/ClickEffect';
 import {
@@ -164,6 +164,9 @@ function App() {
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
   const [gridCols, setGridCols] = useState(8);
   const hoverLockRef = useRef(false);
+
+  // ── Subscribe modal state ──────────────────────────────────────────────────
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
 
   useEffect(() => {
     const updateCols = () => {
@@ -525,6 +528,7 @@ function App() {
               <motion.button
                 whileHover={{ scale: 1.06 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setShowSubscribeModal(true)}
                 className="px-8 py-3 bg-nijiko-blue text-white rounded-full font-bold hover:bg-blue-400 transition-colors"
               >
                 订阅
@@ -593,6 +597,81 @@ function App() {
                   {diaryEntries[selectedGalleryIndex % diaryEntries.length]}
                 </p>
               </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Subscribe Modal ─────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {showSubscribeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowSubscribeModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="bg-white rounded-[2rem] shadow-2xl overflow-hidden max-w-md w-full relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowSubscribeModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </motion.button>
+
+              {/* Decorative Header */}
+              <div className="bg-gradient-to-br from-nijiko-blue to-blue-400 p-8 text-center relative overflow-hidden">
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="inline-block mb-4"
+                >
+                  <Sparkles className="w-12 h-12 text-white" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-white mb-2">感谢你的关注！</h3>
+                <p className="text-white/80 text-sm">织织收到你的心意了～</p>
+              </div>
+
+              {/* Content */}
+              <div className="p-6 text-center space-y-4">
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  className="inline-block"
+                >
+                  <Heart className="w-10 h-10 text-nijiko-blue fill-nijiko-blue mx-auto" />
+                </motion.div>
+                
+                <p className="text-gray-600 leading-relaxed">
+                  这只是一个 <span className="text-nijiko-blue font-semibold">Demo</span> 项目哦～
+                  <br />
+                  订阅功能暂未开放，但织织依然爱你！
+                </p>
+                
+                <p className="text-gray-400 text-sm">
+                  (✧ω✧) 请期待织织的正式上线吧～
+                </p>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowSubscribeModal(false)}
+                  className="mt-4 px-8 py-3 bg-nijiko-blue text-white rounded-full font-bold hover:bg-blue-400 transition-colors"
+                >
+                  知道啦！
+                </motion.button>
+              </div>
             </motion.div>
           </motion.div>
         )}

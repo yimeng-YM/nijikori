@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* scroll-behavior: smooth removed — Lenis handles smooth scrolling */
+  html, body {
+    @apply bg-white text-gray-800 antialiased;
+    overscroll-behavior: none;
+  }
+
+  ::selection {
+    background-color: #87CEEB;
+    color: white;
+  }
+}
+
+.anime-bounce {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}

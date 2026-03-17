@@ -7,7 +7,6 @@ import {
   AnimatePresence,
   useScroll,
   useTransform,
-  useInView,
 } from 'framer-motion';
 import Lenis from 'lenis';
 

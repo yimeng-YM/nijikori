@@ -10,6 +10,21 @@ import {
 } from 'framer-motion';
 import Lenis from 'lenis';
 
+// ─── Image Preloader Utility ──────────────────────────────────────────────────
+
+function preloadImages(urls: string[]): Promise<void[]> {
+  return Promise.all(
+    urls.map((url) => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // Resolve anyway to not block loading
+        img.src = url;
+      });
+    })
+  );
+}
+
 // ─── Scroll-driven reveal wrapper (Scrubbed) ─────────────────────────────────
 
 function Reveal({
@@ -87,10 +102,36 @@ function App() {
     return () => window.removeEventListener('resize', fn);
   }, []);
 
+  // ── Real Resource Loading ─────────────────────────────────────────────
+  const heroImageUrl = '/images/home.png';
+  const logoUrl      = '/images/nijiko_logo.png';
+
+  // Gallery images from import.meta.glob (already resolved at build time)
+  const galleryModules = import.meta.glob(
+    './assets/images/*.{png,jpg,jpeg,webp,gif}',
+    { eager: true, query: '?url', import: 'default' },
+  );
+  const galleryImages = Object.values(galleryModules) as string[];
+
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 2200);
-    return () => clearTimeout(t);
-  }, []);
+    // Collect all images that need to be preloaded
+    const criticalImages = [heroImageUrl, logoUrl];
+    const allImages = [...criticalImages, ...galleryImages];
+    
+    // Minimum loading time for smooth UX (in ms)
+    const minLoadingTime = 1500;
+    const startTime = Date.now();
+    
+    preloadImages(allImages).then(() => {
+      const elapsed = Date.now() - startTime;
+      const remainingTime = Math.max(0, minLoadingTime - elapsed);
+      
+      // Ensure minimum loading time for smooth transition
+      setTimeout(() => {
+        setIsLoading(false);
+      }, remainingTime);
+    });
+  }, [heroImageUrl, logoUrl, galleryImages.length]);
 
   // ── Scroll-driven transforms ────────────────────────────────────────────
 
@@ -117,12 +158,7 @@ function App() {
   // Blur overlay builds as character becomes background
   const blurOpacity = useTransform(scrollY, [windowHeight * 0.5, windowHeight * 2.5], [0, 1]);
 
-  // ── Gallery data ────────────────────────────────────────────────────────
-  const galleryModules = import.meta.glob(
-    './assets/images/*.{png,jpg,jpeg,webp,gif}',
-    { eager: true, query: '?url', import: 'default' },
-  );
-  const galleryImages = Object.values(galleryModules) as string[];
+  // ── Gallery state ────────────────────────────────────────────────────────
   const [showAllGallery, setShowAllGallery] = useState(false);
   const [hoveredGalleryIndex, setHoveredGalleryIndex] = useState<number | null>(null);
   const [selectedGalleryIndex, setSelectedGalleryIndex] = useState<number | null>(null);
@@ -198,9 +234,6 @@ function App() {
     "今天也想听到人的表扬，织织会努力表现的。(✧ω✧)",
     "如果织织变成了棉花娃娃，人会把织织抱在怀里吗？",
   ];
-
-  const heroImageUrl = '/images/home.png';
-  const logoUrl      = '/images/nijiko_logo.png';
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -506,7 +539,7 @@ function App() {
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between text-sm text-gray-500">
           <Reveal className="flex items-center gap-2 mb-4 md:mb-0">
             <Star className="w-4 h-4 fill-nijiko-blue text-nijiko-blue" />
-            <span>© 2025 虹语织 NijiKori Official.</span>
+            <span>© 2026 虹语织 NijiKori Official.</span>
           </Reveal>
           <Reveal delay={1} className="flex space-x-6">
             {['Bilibili', 'Twitter', 'Weibo'].map((link) => (
